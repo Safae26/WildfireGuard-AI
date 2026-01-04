@@ -70,13 +70,13 @@ WildfireGuard-AI/
 ├── README.md             # Project documentation=
 ```
 
-## 🧠 Model Architecture
+## Model Architecture
 The system utilizes a Convolutional Neural Network (CNN) trained on a dataset of satellite forest fire imagery. The model performs binary classification:
 - Preprocessing: Frames are resized to (350, 350) and normalized.
 - Inference: The model outputs a probability score (0.0 - 1.0).
 - Thresholding: If Probability > Threshold (default 0.5), the system triggers a CRITICAL ALERT.
 
-## 🚀 Future Roadmap
+## Future Roadmap
 - Integration with live satellite API feeds.
 - GPS coordinate mapping for detected fires.
 - SMS/Email alert notifications via Twilio or SMTP.
