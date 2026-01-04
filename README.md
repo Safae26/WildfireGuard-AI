@@ -63,10 +63,9 @@ streamlit run app.py
 ```bash
 WildfireGuard-AI/
 ├── app.py                # Main application entry point (Streamlit)
-├── forest_fire.keras     # Trained Deep Learning Model (Required)
+├── =wildfire_detection_model.keras     # Trained Deep Learning Model (Required)
 ├── requirements.txt      # Python dependencies
-├── README.md             # Project documentation
-└── assets/               # (Optional) Images or CSS files
+├── README.md             # Project documentation=
 ```
 
 ## 🧠 Model Architecture
