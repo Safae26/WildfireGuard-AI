@@ -11,7 +11,8 @@
 ---
 
 ## 🖥️ Interface Preview
-<img width="639" height="449" alt="image" src="https://github.com/user-attachments/assets/523c1620-e7d8-45e9-b979-7d260aa05409" />
+<img width="1278" height="451" alt="image" src="https://github.com/user-attachments/assets/8809940a-359a-4caf-acb0-9a7c123e4d92" />
+
 
 ## 🛠️ Project Overview
 
