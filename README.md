@@ -12,7 +12,7 @@
 
 ## 🖥️ Interface Preview
 <img width="1278" height="451" alt="image" src="https://github.com/user-attachments/assets/8809940a-359a-4caf-acb0-9a7c123e4d92" />
-
+<img width="1280" height="553" alt="image" src="https://github.com/user-attachments/assets/ab44de0c-1358-44d4-874d-e26dc57ccdc6" />
 
 ## 🛠️ Project Overview
 
