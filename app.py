@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 import time
 import tensorflow as tf  
+import os 
 
 # --- PAGE CONFIGURATION ---
 st.set_page_config(
@@ -214,33 +215,6 @@ def local_css():
             cursor: default;
         }
 
-        /* Animation du "Noyau" (Core Visual) */
-        .core-visual {
-            width: 100%;
-            height: 250px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            background: radial-gradient(circle, rgba(255,42,42,0.05) 0%, transparent 70%);
-            border: 1px dashed #333;
-            border-radius: 10px;
-        }
-        .core-circle {
-            position: absolute;
-            border-radius: 50%;
-            border: 2px solid transparent;
-            border-top: 2px solid var(--primary-neon);
-            border-bottom: 2px solid var(--primary-neon);
-            animation: spin-core 4s linear infinite;
-        }
-        .c1 { width: 100px; height: 100px; animation-duration: 4s; opacity: 0.8; }
-        .c2 { width: 140px; height: 140px; animation-duration: 6s; opacity: 0.5; border-left: 2px solid var(--secondary-neon); border-right: 2px solid var(--secondary-neon); border-top: transparent; border-bottom: transparent;}
-        .c3 { width: 60px; height: 60px; background: var(--primary-neon); opacity: 0.2; box-shadow: 0 0 20px var(--primary-neon); animation: pulse-core 2s infinite; border: none;}
-
-        @keyframes spin-core { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        @keyframes pulse-core { 0% { transform: scale(0.8); opacity: 0.2; } 50% { transform: scale(1.1); opacity: 0.5; } 100% { transform: scale(0.8); opacity: 0.2; } }
-    
         /* --- FILE UPLOADER DARK MODE --- */
         
         /* La zone de dépôt principale */
@@ -362,13 +336,11 @@ def show_about():
         """, unsafe_allow_html=True)
 
     with col_sys:
-        st.markdown("<h3 class='mission-header' style='text-align:center;'>SYSTEM CORE</h3>", unsafe_allow_html=True)
         st.markdown("""
         <div class="core-visual">
-            <div class="core-circle c1"></div>
-            <div class="core-circle c2"></div>
-            <div class="core-circle c3"></div>
-            <div style="position: absolute; font-family: 'Orbitron'; font-size: 0.8rem; color: white; letter-spacing: 2px;">AI ONLINE</div>
+            <div class="reticle-line h-line"></div>
+            <div class="reticle-line v-line"></div>
+            <div class="scanning-box"></div>
         </div>
         """, unsafe_allow_html=True)
 
@@ -378,7 +350,7 @@ def show_about():
         st.markdown("<h4 style='text-align:center; color:#888; margin-bottom:10px;'>ARCHITECTURAL MODULES</h4>", unsafe_allow_html=True)
         st.markdown("""
         <div class="tech-container" style="justify-content: center;">
-            <span class="tech-badge">Python 3.10</span>
+            <span class="tech-badge">Python</span>
             <span class="tech-badge">Streamlit</span>
             <span class="tech-badge">OpenCV</span>
             <span class="tech-badge">Keras</span>
@@ -388,7 +360,7 @@ def show_about():
 
     # Footer Signature
     st.markdown("---")
-    st.markdown("<p class='footer-safae'>SYSTEM ARCHITECT: <span>SAFAE</span> | CLASSIFICATION: TOP SECRET</p>", unsafe_allow_html=True)
+    st.markdown("<p class='footer-safae'>SYSTEM CRAFTED BY : <span>SAFAE</span></p>", unsafe_allow_html=True)
 
 def focal_loss(gamma=2.0, alpha=0.75):
     def focal_loss_fn(y_true, y_pred):
@@ -434,19 +406,35 @@ def preprocess_frame(frame, target_size):
     return img
 
 # --- DASHBOARD PAGE ---
-import os 
 def show_dashboard():
     model = load_model()
+
+    if 'logs_history' not in st.session_state:
+        st.session_state.logs_history = ["> System initialized...", "> AI Model Loaded."]
 
     with st.sidebar:
         st.markdown("### ⚙️ SETTINGS")
         st.markdown("---")
         conf_threshold = st.slider("CONFIDENCE THRESHOLD", 0.0, 1.0, 0.5)
         
-        # Le toggle pour activer/désactiver la surveillance
+        # Toggle to activate/deactivate surveillance
         run_detection = st.toggle("ACTIVATE SURVEILLANCE", value=True)
         
         st.markdown("<br>", unsafe_allow_html=True)
+
+        if st.button("REPORT GENERATION", use_container_width=True):
+            if st.session_state.logs_history:
+                # Clean HTML tags for the text report
+                report_text = "\n".join([log.replace("<span>", "").replace("</span>", "").replace("<span style='color:red'>", "") for log in st.session_state.logs_history])
+                st.download_button(
+                    label="DOWNLOAD MISSION LOGS",
+                    data=report_text,
+                    file_name="wildfire_mission_log.txt",
+                    mime="text/plain"
+                )
+
+        st.markdown("<br>", unsafe_allow_html=True)
+
         if st.button("⬅ EXIT"):
             navigate_to("Home")
         
@@ -454,27 +442,28 @@ def show_dashboard():
         st.markdown("<div style='text-align: center; color: #555; font-size: 0.8rem; font-family: Orbitron;'>MADE BY <span style='color: #FF2A2A;'>SAFAE</span></div>", unsafe_allow_html=True)
 
     st.markdown("## 📡 TELEMETRY")
-    m1, m2 = st.columns(2)
-    with m1: metric_area = st.empty()
-    with m2: metric_fire = st.empty()
 
-    # Initialisation des valeurs
-    metric_area.metric("AREA", "0 km²", "WAITING")
-    metric_fire.metric("FIRES", "0", "SAFE")
+    # Layout columns for metrics
+    m1, m2 = st.columns(2)
+    with m1: 
+        metric_area = st.empty()
+    with m2: 
+        metric_fire = st.empty()
+
+    # Initial display
+    metric_area.metric(label="PROCESSING SPEED (FPS)", value="0.0")
+    metric_fire.metric(label="FIRES DETECTED", value="0", delta="SAFE")
 
     st.markdown("---")
-    # ---------------------------------------------------
 
     col_video, col_terminal = st.columns([2, 1], gap="medium")
     
     with col_terminal:
         st.markdown("### 📟 LOGS")
         log_container = st.empty()
-        # Initialisation des logs
-        log_html_start = """
+        log_html_start = f"""
         <div class="terminal-container" style="background:#000; border:1px solid #333; padding:15px; font-family:'Courier New'; color:#00ff41; height: 400px; overflow-y:auto;">
-            <span style='opacity:0.5'>> System initialized...</span><br>
-            <span style='opacity:0.5'>> AI Model Loaded: wildfire_detection.keras</span>
+            {"<br>".join(st.session_state.logs_history)}
         </div>
         """
         log_container.markdown(log_html_start, unsafe_allow_html=True)
@@ -485,8 +474,7 @@ def show_dashboard():
         video_placeholder = st.empty()
 
         if video_file is None:
-            # Animation d'attente (Scanner)
-            video_placeholder.markdown(f"""
+            video_placeholder.markdown("""
             <div class="scan-container">
                 <div class="grid-overlay"></div>
                 <div class="scan-line"></div>
@@ -498,16 +486,10 @@ def show_dashboard():
             """, unsafe_allow_html=True)
         
         else:
-            # Vérification du modèle
             if model is not None:
                 input_shape = model.input_shape
-                # Gestion robuste de la taille d'entrée
-                if len(input_shape) > 2 and input_shape[1] is not None:
-                    target_size = (input_shape[1], input_shape[2])
-                else:
-                    target_size = (224, 224) # Fallback standard
+                target_size = (input_shape[1], input_shape[2]) if len(input_shape) > 2 and input_shape[1] is not None else (224, 224)
             
-            # Gestion Fichier Temporaire
             tfile = tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') 
             tfile.write(video_file.read())
             tfile.close() 
@@ -521,29 +503,41 @@ def show_dashboard():
                 if run_detection:
                     st.toast("System Online. Analyzing feed...", icon="🔥")
                 
-                logs_history = ["> Connecting to satellite...", "> Feed received."]
+                st.session_state.logs_history.extend(["> Connecting to satellite...", "> Feed received."])
+                
                 frame_skip = 2 
                 frame_count = 0
+                prev_time = time.time() # Used for real-time FPS calculation
 
-                # Boucle principale
                 while vf.isOpened():
-                    # Si l'utilisateur désactive le toggle, on arrête la boucle
                     if not run_detection:
                         video_placeholder.markdown("### 🛑 SURVEILLANCE PAUSED")
                         break
 
                     ret, frame = vf.read()
                     if not ret:
-                        break # Fin de la vidéo
+                        # Log mission end
+                        st.session_state.logs_history.append("> END OF FEED: Mission archived.")
+                        break 
                     
                     frame_count += 1
                     
-                    # On ne fait la prédiction que tous les X frames pour la performance
+                    # Process only every X frames for performance
                     if frame_count % frame_skip == 0:
-                        
-                        # Copie pour le dessin (bounding box)
+                        # --- FPS CALCULATION ---
+                        curr_time = time.time()
+                        time_diff = curr_time - prev_time
+                        if time_diff > 0:
+                            fps = 1 / time_diff
+                        else:
+                            fps = 0.0
+                        prev_time = curr_time
+
+                        # Update FPS metric every 5 processed frames to prevent UI flicker
+                        if frame_count % (frame_skip * 5) == 0:
+                            metric_area.metric(label="PROCESSING SPEED (FPS)", value=f"{fps:.1f}")
+
                         display_frame = frame.copy()
-                        
                         is_fire = False
                         confidence = 0.0
 
@@ -551,56 +545,53 @@ def show_dashboard():
                             processed_frame = preprocess_frame(frame, target_size=target_size)
                             prediction = model.predict(processed_frame, verbose=0)
                             
-                            # Gestion binaire vs catégorique
-                            if prediction.shape[-1] == 1:
-                                confidence = float(prediction[0][0])
-                            else:
-                                confidence = float(prediction[0][0]) 
-                            
-                            # Seuil de détection
+                            # Handle binary vs categorical output
+                            confidence = float(prediction[0][0])
                             is_fire = confidence > conf_threshold
 
                         except Exception as e:
                             print(f"Inference error: {e}")
 
-                        # --- DESSIN SUR L'IMAGE ---
+                        # --- VISUAL FEEDBACK & DRAWING ---
                         if is_fire:
-                            # Rectangle Rouge
-                            cv2.rectangle(display_frame, (0, 0), (display_frame.shape[1], display_frame.shape[0]), (0, 0, 255), 10)
-                            label = f"FIRE DETECTED ({confidence*100:.1f}%)"
-                            # Fond noir pour le texte
-                            cv2.rectangle(display_frame, (20, 10), (450, 60), (0,0,0), -1) 
-                            cv2.putText(display_frame, label, (20, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+                            # 1. Much thicker main border (thickness=20)
+                            cv2.rectangle(display_frame, (0, 0), (display_frame.shape[1], display_frame.shape[0]), (0, 0, 255), 20)
                             
-                            # Mise à jour des logs
+                            # 2. Larger Text Label (fontScale=2, thickness=4)
+                            label = f"FIRE DETECTED ({confidence*100:.1f}%)"
+                            
+                            # 3. Bigger background box for text
+                            cv2.rectangle(display_frame, (20, 20), (850, 110), (0,0,0), -1) 
+                            cv2.putText(display_frame, label, (40, 85), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 4)
+                            
                             if frame_count % (frame_skip * 5) == 0:
                                 current_time = time.strftime("%H:%M:%S")
-                                logs_history.append(f"> <span style='color:red'>ALERT: CONF {confidence:.2f} AT {current_time}</span>")
-                                if len(logs_history) > 8: logs_history.pop(0)
-                                
-                                log_text = "<br>".join(logs_history)
-                                log_container.markdown(f"""
-                                <div class="terminal-container" style="background:#000; border:1px solid #333; padding:15px; font-family:'Courier New'; color:#00ff41; height: 400px; overflow-y:auto;">
-                                    {log_text}<br>> <span class="blink">_</span>
-                                </div>""", unsafe_allow_html=True)
-                                
+                                st.session_state.logs_history.append(f"> <span style='color:red'>ALERT: CONF {confidence:.2f} AT {current_time}</span>")
+                                if len(st.session_state.logs_history) > 20: st.session_state.logs_history.pop(2)
+                                log_text = "<br>".join(st.session_state.logs_history[-8:])
+                                log_container.markdown(f"""<div class="terminal-container" style="background:#000; border:1px solid #333; padding:15px; font-family:'Courier New'; color:#00ff41; height: 400px; overflow-y:auto;">{log_text}<br>> <span class="blink">_</span></div>""", unsafe_allow_html=True)
                                 metric_fire.metric("FIRES", "CRITICAL", "DETECTED", delta_color="inverse")
                         
                         elif not is_fire and frame_count % 30 == 0:
                              metric_fire.metric("FIRES", "0", "SAFE")
 
-                        # Affichage de l'image
                         display_frame_rgb = cv2.cvtColor(display_frame, cv2.COLOR_BGR2RGB)
                         video_placeholder.image(display_frame_rgb, channels="RGB", use_container_width=True)
 
-            vf.release()
+                vf.release()
+                
+                # Update final terminal state
+                log_text = "<br>".join(st.session_state.logs_history[-8:])
+                log_container.markdown(f"""
+                <div class="terminal-container" style="background:#000; border:1px solid #333; padding:15px; font-family:'Courier New'; color:#00ff41; height: 400px; overflow-y:auto;">
+                    {log_text}
+                </div>""", unsafe_allow_html=True)
             
-            # --- NETTOYAGE ---
+            # --- CLEANUP ---
             try:
                 os.remove(tfile_path)
             except:
                 pass
-
 # --- ROUTER ---
 if st.session_state.page == "Home":
     show_home()
