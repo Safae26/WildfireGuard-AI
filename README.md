@@ -11,6 +11,8 @@
 ---
 
 ## 🖥️ Interface Preview
+<img width="1278" height="451" alt="image" src="https://github.com/user-attachments/assets/8809940a-359a-4caf-acb0-9a7c123e4d92" />
+<img width="1280" height="553" alt="image" src="https://github.com/user-attachments/assets/ab44de0c-1358-44d4-874d-e26dc57ccdc6" />
 
 ## 🛠️ Project Overview
 
@@ -63,19 +65,18 @@ streamlit run app.py
 ```bash
 WildfireGuard-AI/
 ├── app.py                # Main application entry point (Streamlit)
-├── forest_fire.keras     # Trained Deep Learning Model (Required)
+├── =wildfire_detection_model.keras     # Trained Deep Learning Model (Required)
 ├── requirements.txt      # Python dependencies
-├── README.md             # Project documentation
-└── assets/               # (Optional) Images or CSS files
+├── README.md             # Project documentation=
 ```
 
-## 🧠 Model Architecture
+## Model Architecture
 The system utilizes a Convolutional Neural Network (CNN) trained on a dataset of satellite forest fire imagery. The model performs binary classification:
 - Preprocessing: Frames are resized to (350, 350) and normalized.
 - Inference: The model outputs a probability score (0.0 - 1.0).
 - Thresholding: If Probability > Threshold (default 0.5), the system triggers a CRITICAL ALERT.
 
-## 🚀 Future Roadmap
+## Future Roadmap
 - Integration with live satellite API feeds.
 - GPS coordinate mapping for detected fires.
 - SMS/Email alert notifications via Twilio or SMTP.
